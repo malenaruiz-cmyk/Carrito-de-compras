@@ -7,7 +7,7 @@ const cargar = async  () => {
     const snapshot = await getDocs(collection(db, "productos"));
     productos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
-    for (let producto of productos) {
+    for (let i = 0; i < producto.length; i = i + 1) {
         let parrafo = document.createElement("div")
         parrafo.id= "boxproducto"
         parrafo.innerHTML=`<h2 id="nombre">${producto.nombre}</h2>
@@ -26,8 +26,8 @@ const cargar = async  () => {
 
 cargar()
 
-const verdetalle = (idproducto) => {
-  const buscarProducto = productos.find(producto => producto.id === idproducto);
+function verdetalle = (idproducto) {
+  const buscarProducto = productos.find(producto => producto.id === parseInt (idproducto);
   let productojson = JSON.stringify(buscarProducto)
   localStorage.setItem("producto", productojson)
   window.location.href ="detalle.html"
