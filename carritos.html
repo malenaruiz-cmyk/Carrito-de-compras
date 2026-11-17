@@ -1,32 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mercado Pago</title>
-    <link rel="stylesheet" href="carrito.css">
-</head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tu carrito | TA-TE-TI</title>
+  <link rel="stylesheet" href="estilos.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet"></head>
 <body>
-    <header>
-        <h1>Mercado Pago Trucheli</h1>
-        <nav>
-            <ul>
-                <li><a href="index.html">Inicio</a></li>
-                <li><a href="productos.html">Productos</a></li>
-                <li><a href="contacto.html">Contacto</a></li>
-                <li><a href="carrito.html">Carrito</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main id="boxproductos">
-        
-    </main>
-    <footer> 
-        <h2>Librería TA-TE-TI</h2>
-        <p></p>
-        <p></p>
-    </footer>
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div class="container header__inner">
+      <a href="index.html" class="logo" aria-label="TA-TE-TI inicio">
+        <img src="img/logo1.png" alt="logo TA-TE-TI" height="70px" width="auto">
+      </a>
 
-    <script src="cargarproductos.js"></script>
+      <nav class="nav" aria-label="Navegación principal">
+        <a href="index.html">Inicio</a>
+        <a href="productos.html">Productos</a>
+        <a href="contacto.html">Contacto</a>
+      </nav>
+
+      <a class="cart-btn" href="carrito.html" aria-label="Ir al carrito de compras">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        <span class="cart-btn__count" id="contadorcarrito" hidden>0</span>
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <h1>Tu carrito</h1>
+        <p>Revisá tu compra antes de finalizar.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <!-- Se completa con los productos guardados en el carrito -->
+        <div class="cart-list" id="lista"></div>
+
+        <div class="cart-summary">
+          <p class="cart-summary__total">Total a pagar <strong id="totalapagar">$0</strong></p>
+          <button class="btn btn--primary" id="finalizarcompra" disabled>Finalizar compra</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER  -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__col">
+        <span class="logo logo--footer">
+          <img src="img/logo1.png" alt="logo TA-TE-TI" height="100px" width="auto">
+        </span>
+      </div>
+
+      <div class="footer__col">
+        <h4>Direcciones</h4>
+        <p>📍 Gorostiaga</p>
+        <p>📍 Mitre</p>
+      </div>
+
+      <div class="footer__col">
+        <h4>Teléfonos</h4>
+        <p>📞 11 1234 5678</p>
+        <p>📞 11 8765 4321</p>
+      </div>
+
+      <div class="footer__col">
+        <h4>Seguinos</h4>
+        <p>
+          <a href="https://instagram.com/tateti.ig" target="_blank" rel="noopener">📷 tateti.ig</a>
+        </p>
+        <p>
+          <a href="https://facebook.com/tateti.facebook" target="_blank" rel="noopener">👍 tateti.facebook</a>
+        </p>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <p>&copy; 2026 TA-TE-TI · Todos los derechos reservados</p>
+    </div>
+  </footer>
+
+  <script type="module" src="carrito.js"></script>
 </body>
 </html>
