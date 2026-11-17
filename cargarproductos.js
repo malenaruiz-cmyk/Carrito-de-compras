@@ -1,43 +1,97 @@
 import { db } from "./firebase-config.js";
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+import { tarjetaProducto, agregarAlCarrito, avisar, etiquetaCategoria, esc } from "./tienda.js";
 
-let productos = [];
+// Controla el catálogo principal y la sección de destacados del inicio con sus filtros por categoría
 
-const cargar = async  () => {
+const grillaProductos = document.getElementById("boxproductos");
+const barraFiltros = document.getElementById("filters");
+const limiteMaximo = Number(grillaProductos?.dataset.limite) || Infinity;
+
+let listadoProductos = [];
+let categoriaActiva = "todos";
+
+// Normaliza la categoría para evitar problemas con mayúsculas o espacios
+const obtenerCategoria = (prod) => String(prod.categoria ?? "").trim().toLowerCase();
+
+function renderizarCatalogo() {
+  let filtrados = categoriaActiva === "todos" 
+    ? listadoProductos 
+    : listadoProductos.filter((p) => obtenerCategoria(p) === categoriaActiva);
+  
+  filtrados = filtrados.slice(0, limiteMaximo);
+
+  grillaProductos.innerHTML = filtrados.length
+    ? filtrados.map(tarjetaProducto).join("")
+    : `<p class="empty">No hay productos para mostrar en esta sección.</p>`;
+}
+
+function renderizarFiltros() {
+  if (!barraFiltros) return;
+
+  const categoriasDisponibles = [...new Set(listadoProductos.map(obtenerCategoria).filter(Boolean))];
+  
+  // Si hay una sola categoría o ninguna, ocultamos los filtros para no estorbar
+  if (categoriasDisponibles.length < 2) {
+    barraFiltros.hidden = true;
+    return;
+  }
+
+  barraFiltros.innerHTML =
+    `<button class="filter-chip is-active" data-cat="todos">Todos</button>` +
+    categoriasDisponibles
+      .map((cat) => `<button class="filter-chip" data-cat="${esc(cat)}">${esc(etiquetaCategoria(cat))}</button>`)
+      .join("");
+  
+  barraFiltros.hidden = false;
+}
+
+async function cargarDatos() {
+  grillaProductos.innerHTML = `<p class="empty">Cargando productos...</p>`;
+  
+  try {
     const snapshot = await getDocs(collection(db, "productos"));
-    productos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-
-    for (let i = 0; i < producto.length; i = i + 1) {
-        let parrafo = document.createElement("div")
-        parrafo.id= "boxproducto"
-        parrafo.innerHTML=`<h2 id="nombre">${producto.nombre}</h2>
-                        <img src="${producto.imagen}" alt="" id="" width="200">
-                        <p id="detalle">${producto.descripcion}</p>
-                        <h3 id="precio">$ ${producto.precio}</h3>
-                        <p id="stock">${producto.stock}</p>
-                        <button class="btndetalle">Ver detalle</button>`
-        parrafo.querySelector(".btndetalle").addEventListener("click", () => {
-            verdetalle(producto.id);
-        });
-
-        document.getElementById("boxproductos").appendChild(parrafo)
-    }
+    listadoProductos = snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+    
+    renderizarFiltros();
+    renderizarCatalogo();
+  } catch (error) {
+    console.error("Error al conectar con Firebase:", error);
+    grillaProductos.innerHTML = `<p class="empty">No pudimos cargar los productos. Probá de nuevo en un rato.</p>`;
+  }
 }
 
-cargar()
+// ===== EVENTOS DE INTERACCIÓN =====
 
-function verdetalle = (idproducto) {
-  const buscarProducto = productos.find(producto => producto.id === parseInt (idproducto);
-  let productojson = JSON.stringify(buscarProducto)
-  localStorage.setItem("producto", productojson)
-  window.location.href ="detalle.html"
+if (barraFiltros) {
+  barraFiltros.addEventListener("click", (evento) => {
+    const botonChip = evento.target.closest(".filter-chip");
+    if (!botonChip) return;
+
+    barraFilltros?.querySelectorAll(".filter-chip").forEach((chip) => chip.classList.remove("is-active"));
+    barraFiltros.querySelectorAll(".filter-chip").forEach((chip) => chip.classList.remove("is-active"));
+    botonChip.classList.add("is-active");
+    
+    categoriaActiva = botonChip.dataset.cat;
+    renderizarCatalogo();
+  });
 }
 
-const vercarrito = () =>{
-    let carrito = JSON.parse(localStorage.getItem("carrito"))
-    if (carrito!= null){
-        document.getElementById("contadorcarrito").style.display="block"
-        document.getElementById("contadorcarrito").innerHTML = localStorage.getItem("contadorcarrito")
-    }
-}
-vercarrito()
+grillaProductos.addEventListener("click", (evento) => {
+  const botonAgregar = evento.target.closest("[data-add]");
+  if (!botonAgregar) return;
+
+  const productoEncontrado = listadoProductos.find((p) => p.id === botonAgregar.dataset.add);
+  if (!productoEncontrado) return;
+
+  const resultadoCompra = agregarAlCarrito(productoEncontrado, 1);
+  
+  if (resultadoCompra.ok) {
+    avisar(`${productoEncontrado.nombre} agregado al carrito 🛒`);
+  } else {
+    avisar("Ya tenés todo el stock disponible en tu carrito");
+  }
+});
+
+// ¡Arrancamos!
+cargarDatos();
